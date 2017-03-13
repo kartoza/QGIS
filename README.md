@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/kartoza/QGIS.png?label=ready&title=Ready)](https://waffle.io/kartoza/QGIS)
 # About QGIS
 
 [![Build Status](https://travis-ci.org/qgis/QGIS.svg?branch=master)](https://travis-ci.org/qgis/QGIS)
