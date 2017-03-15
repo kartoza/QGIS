@@ -441,6 +441,8 @@ SET(QGIS_CORE_SRCS
   fieldformatter/qgsvaluemapfieldformatter.cpp
   fieldformatter/qgsvaluerelationfieldformatter.cpp
 
+  geonode/qgsgeonodeconnection.cpp
+
   ${CMAKE_CURRENT_BINARY_DIR}/qgscontexthelp_texts.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/qgsexpression_texts.cpp
 )
@@ -671,6 +673,8 @@ SET(QGIS_CORE_MOC_HDRS
   layertree/qgslayertreemodellegendnode.h
   layertree/qgslayertreenode.h
   layertree/qgslayertreeregistrybridge.h
+
+  geonode/qgsgeonodeconnection.h
 )
 
 IF (NOT WITH_QTWEBKIT)
@@ -1033,6 +1037,8 @@ SET(QGIS_CORE_HDRS
   fieldformatter/qgsrelationreferencefieldformatter.h
   fieldformatter/qgsvaluemapfieldformatter.h
   fieldformatter/qgsvaluerelationfieldformatter.h
+
+  geonode/qgsgeonodeconnection.h
 
   metadata/qgslayermetadata.h
   metadata/qgslayermetadatavalidator.h

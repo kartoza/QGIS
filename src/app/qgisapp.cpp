@@ -1033,8 +1033,7 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
   }
 
   // add geonode menu under web menu
-  mWebMenu->addMenu( mGeonodeMenu );
-  mGeonodeMenu->addAction( mActionAddGeonodeLayer );
+  addPluginToWebMenu( mGeonodeMenu->title(), mActionAddGeonodeLayer );
 
   // Set icon size of toolbars
   int size = settings.value( QStringLiteral( "IconSize" ), QGIS_ICON_SIZE ).toInt();
@@ -4453,12 +4452,16 @@ void QgisApp::askUserForOGRSublayers( QgsVectorLayer *layer )
 
 void QgisApp::addGeonodeLayer()
 {
-  QgsGeonodeSourceSelect *geonodes = new QgsGeonodeSourceSelect( this, 0, true );
+  QgsDebugMsg( "about to addGeonodeLayer" );
+
+  QgsGeoNodeSourceSelect *geonodes = new QgsGeoNodeSourceSelect( this, 0, true );
   if ( !geonodes )
   {
     QMessageBox::warning( this, tr( "Geonode" ), tr( "Cannot get Geonode select dialog." ) );
     return;
   }
+  connect( geonodes, SIGNAL( addRasterLayer( QString const &, QString const &, QString const & ) ),
+           this, SLOT( addRasterLayer( QString const &, QString const &, QString const & ) ) );
   geonodes->exec();
   delete geonodes;
 }
