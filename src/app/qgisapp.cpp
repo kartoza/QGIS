@@ -286,6 +286,7 @@ Q_GUI_EXPORT extern int qt_defaultDpiX();
 #include "qgsnewnamedialog.h"
 #include "qgsgui.h"
 #include "qgsdatasourcemanagerdialog.h"
+#include "qgsgeonodesourceselect.h"
 
 #include "qgssublayersdialog.h"
 #include "ogr/qgsopenvectorlayerdialog.h"
@@ -797,9 +798,9 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
 
   endProfile();
 
+  functionProfile( &QgisApp::createMenus, this, QStringLiteral( "Create menus" ) );
   functionProfile( &QgisApp::createActions, this, QStringLiteral( "Create actions" ) );
   functionProfile( &QgisApp::createActionGroups, this, QStringLiteral( "Create action group" ) );
-  functionProfile( &QgisApp::createMenus, this, QStringLiteral( "Create menus" ) );
   functionProfile( &QgisApp::createToolBars, this, QStringLiteral( "Toolbars" ) );
   functionProfile( &QgisApp::createStatusBar, this, QStringLiteral( "Status bar" ) );
   functionProfile( &QgisApp::createCanvasTools, this, QStringLiteral( "Create canvas tools" ) );
@@ -1030,6 +1031,10 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
     mActionShowPythonDialog = nullptr;
     mActionInstallFromZip = nullptr;
   }
+
+  // add geonode menu under web menu
+  mWebMenu->addMenu( mGeonodeMenu );
+  mGeonodeMenu->addAction( mActionAddGeonodeLayer );
 
   // Set icon size of toolbars
   int size = settings.value( QStringLiteral( "IconSize" ), QGIS_ICON_SIZE ).toInt();
@@ -1846,6 +1851,10 @@ void QgisApp::createActions()
   connect( mActionLabeling, &QAction::triggered, this, &QgisApp::labeling );
   connect( mActionStatisticalSummary, &QAction::triggered, this, &QgisApp::showStatisticsDockWidget );
 
+  // Web Menu Items
+
+  connect( mActionAddGeonodeLayer, &QAction::triggered, this, &QgisApp::addGeonodeLayer );
+
   // Layer Menu Items
 
   connect( mActionDataSourceManager, &QAction::triggered, this, [ = ]( ) { dataSourceManager( ); } );
@@ -2141,6 +2150,12 @@ void QgisApp::createMenus()
   mPanelMenu->setObjectName( QStringLiteral( "mPanelMenu" ) );
   mToolbarMenu = new QMenu( tr( "Toolbars" ), this );
   mToolbarMenu->setObjectName( QStringLiteral( "mToolbarMenu" ) );
+
+  // Geonode Submenu
+  mGeonodeMenu = new QMenu( tr( "GeoNode" ), this );
+  mGeonodeMenu->setObjectName( QStringLiteral( "mGeonodeMenu" ) );
+  // Geonode Action
+  mActionAddGeonodeLayer = new QAction( tr( "Add GeoNode Layers..." ), this );
 
   // Get platform for menu layout customization (Gnome, Kde, Mac, Win)
   QDialogButtonBox::ButtonLayout layout =
@@ -4434,6 +4449,18 @@ void QgisApp::askUserForOGRSublayers( QgsVectorLayer *layer )
         group->addLayer( l );
     }
   }
+}
+
+void QgisApp::addGeonodeLayer()
+{
+  QgsGeonodeSourceSelect *geonodes = new QgsGeonodeSourceSelect( this, 0, true );
+  if ( !geonodes )
+  {
+    QMessageBox::warning( this, tr( "Geonode" ), tr( "Cannot get Geonode select dialog." ) );
+    return;
+  }
+  geonodes->exec();
+  delete geonodes;
 }
 
 void QgisApp::addDatabaseLayer()
