@@ -206,6 +206,9 @@ QMenu *QgsAppLayerTreeViewMenuProvider::createContextMenu()
         }
       }
 
+      menu->addAction( QgsApplication::getThemeIcon( QStringLiteral( "/propertyicons/metadata.svg" ) ), tr( "&Edit Metadata" ),
+                       QgisApp::instance(), SLOT( metadataWizard() ) );
+
       menu->addSeparator();
 
       if ( vlayer )

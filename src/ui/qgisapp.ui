@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1018</width>
+    <width>1256</width>
     <height>506</height>
    </rect>
   </property>
@@ -16,8 +16,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1018</width>
-     <height>25</height>
+     <width>1256</width>
+     <height>22</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -358,6 +358,7 @@
    <addaction name="mActionAddWfsLayer"/>
    <addaction name="mActionAddDelimitedText"/>
    <addaction name="mActionAddVirtualLayer"/>
+   <addaction name="mActionOpenMetadataWizardEditor"/>
   </widget>
   <widget class="QToolBar" name="mDigitizeToolBar">
    <property name="windowTitle">
@@ -2601,6 +2602,15 @@ Acts on currently active editable layer</string>
    </property>
    <property name="text">
     <string>Install plugin from ZIP...</string>
+   </property>
+  </action>
+  <action name="mActionOpenMetadataWizardEditor">
+   <property name="icon">
+    <iconset resource="../../images/images.qrc">
+     <normaloff>:/images/themes/default/propertyicons/metadata.svg</normaloff>:/images/themes/default/propertyicons/metadata.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open Metadata Wizard Editor</string>
    </property>
   </action>
  </widget>
