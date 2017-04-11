@@ -70,6 +70,7 @@ class QgsMapTip;
 class QgsMapTool;
 class QgsMapToolAdvancedDigitizing;
 class QgsMapToolIdentifyAction;
+class QgsMetadataWizard;
 class QgsPluginLayer;
 class QgsPluginLayer;
 class QgsPluginManager;
@@ -134,6 +135,7 @@ class QgsDiagramProperties;
 #include "qgsraster.h"
 #include "qgsrasterminmaxorigin.h"
 #include "qgsmaplayeractionregistry.h"
+#include "qgsmetadatawizard.h"
 
 #include "ui_qgisapp.h"
 #include "qgis_app.h"
@@ -877,6 +879,8 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     //#endif
     //! Add a virtual layer
     void addVirtualLayer();
+    //! Open the metadata wizard
+    void metadataWizard();
     //! toggles whether the current selected layer is in overview or not
     void isInOverview();
     //! Store the position for map tool tip
