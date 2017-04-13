@@ -110,6 +110,7 @@
 // QGIS Specific Includes
 //
 
+#include "qgscrashdialog.h"
 #include "qgisapp.h"
 #include "qgisappinterface.h"
 #include "qgisappstylesheet.h"
@@ -12254,6 +12255,8 @@ void QgisApp::masterPasswordSetup()
 {
   connect( QgsAuthManager::instance(), &QgsAuthManager::messageOut,
            this, &QgisApp::authMessageOut );
+  connect( QgsAuthManager::instance(), &QgsAuthManager::passwordHelperMessageOut,
+           this, &QgisApp::authMessageOut );
   connect( QgsAuthManager::instance(), &QgsAuthManager::authDatabaseEraseRequested,
            this, &QgisApp::eraseAuthenticationDatabase );
 }
@@ -12289,12 +12292,17 @@ void QgisApp::eraseAuthenticationDatabase()
 
 void QgisApp::authMessageOut( const QString &message, const QString &authtag, QgsAuthManager::MessageLevel level )
 {
-  // only if main window is active window
+  // Use system notifications if the main window is not the active one,
+  // push message to the message bar if the main window is active
   if ( qApp->activeWindow() != this )
-    return;
-
-  int levelint = static_cast< int >( level );
-  messageBar()->pushMessage( authtag, message, static_cast< QgsMessageBar::MessageLevel >( levelint ), 7 );
+  {
+    showSystemNotification( tr( "QGIS Authentication" ), message );
+  }
+  else
+  {
+    int levelint = static_cast< int >( level );
+    messageBar()->pushMessage( authtag, message, static_cast< QgsMessageBar::MessageLevel >( levelint ), 7 );
+  }
 }
 
 void QgisApp::completeInitialization()
@@ -12498,6 +12506,9 @@ void QgisApp::transactionGroupCommitError( const QString &error )
 #ifdef Q_OS_WIN
 LONG WINAPI QgisApp::qgisCrashDump( struct _EXCEPTION_POINTERS *ExceptionInfo )
 {
+  // Crash dump creation will be move to a new class in the near future.
+
+#if 0
   QString dumpName = QDir::toNativeSeparators(
                        QString( "%1\\qgis-%2-%3-%4-%5.dmp" )
                        .arg( QDir::tempPath() )
@@ -12531,8 +12542,18 @@ LONG WINAPI QgisApp::qgisCrashDump( struct _EXCEPTION_POINTERS *ExceptionInfo )
   {
     msg = QObject::tr( "creation of minidump to %1 failed (%2)" ).arg( dumpName ).arg( GetLastError(), 0, 16 );
   }
+#endif
 
-  QMessageBox::critical( 0, QObject::tr( "Crash dumped" ), msg );
+  QgsCrashDialog dlg( QApplication::activeWindow() );
+  if ( dlg.exec() )
+  {
+    QStringList arguments;
+    arguments = QCoreApplication::arguments();
+    QString path = arguments.at( 0 );
+    arguments.removeFirst();
+    arguments << QgsProject::instance()->fileName();
+    QProcess::startDetached( path, arguments, QDir::toNativeSeparators( QCoreApplication::applicationDirPath() ) );
+  }
 
   return EXCEPTION_EXECUTE_HANDLER;
 }
