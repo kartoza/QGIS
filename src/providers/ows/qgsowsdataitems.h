@@ -16,7 +16,11 @@
 #define QGSOWSDATAITEMS_H
 
 #include "qgsdataitem.h"
+#include "qgsdataitemprovider.h"
+#include "qgsdataprovider.h"
 #include "qgsdatasourceuri.h"
+#include "qgsgeonodeconnection.h"
+
 class QgsOWSConnectionItem : public QgsDataCollectionItem
 {
     Q_OBJECT
@@ -54,6 +58,17 @@ class QgsOWSRootItem : public QgsDataCollectionItem
     void connectionsChanged();
 
     void newConnection();
+};
+
+//! Provider for ows root data item
+class QgsOwsDataItemProvider : public QgsDataItemProvider
+{
+  public:
+    virtual QString name() override { return QStringLiteral( "OWS" ); }
+
+    virtual int capabilities() override { return QgsDataProvider::Net; }
+
+    virtual QgsDataItem *createDataItem( const QString &path, QgsDataItem *parentItem ) override;
 };
 
 #endif // QGSOWSDATAITEMS_H

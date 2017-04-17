@@ -4,6 +4,9 @@
 
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QUrl>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 #include "qgsgeonodenewconnection.h"
 #include "qgsauthmanager.h"
@@ -11,6 +14,7 @@
 #include "qgsdatasourceuri.h"
 #include "qgsgeonodeconnection.h"
 #include "qgssettings.h"
+#include "qgsnetworkaccessmanager.h"
 
 QgsGeoNodeNewConnection::QgsGeoNodeNewConnection( QWidget *parent, const QString &connName, Qt::WindowFlags fl )
   : QDialog( parent, fl )
@@ -53,8 +57,9 @@ QgsGeoNodeNewConnection::QgsGeoNodeNewConnection( QWidget *parent, const QString
   resize( w, height() );
 
   buttonBox->button( QDialogButtonBox::Ok )->setDisabled( true );
-  connect( txtName, SIGNAL( textChanged( QString ) ), this, SLOT( okButtonBehavior( QString ) ) );
-  connect( txtUrl, SIGNAL( textChanged( QString ) ), this, SLOT( okButtonBehavior( QString ) ) );
+  connect( txtName, &QLineEdit::textChanged, this, &QgsGeoNodeNewConnection::okButtonBehavior );
+  connect( txtUrl, &QLineEdit::textChanged, this, &QgsGeoNodeNewConnection::okButtonBehavior );
+  connect( btnConnect, &QPushButton::clicked, this, &QgsGeoNodeNewConnection::testConnection );
 }
 
 void QgsGeoNodeNewConnection::accept()
@@ -86,7 +91,7 @@ void QgsGeoNodeNewConnection::accept()
   // on rename delete original entry first
   if ( !mOriginalConnName.isNull() && mOriginalConnName != key )
   {
-    settings.remove( mBaseKey + mOriginalConnName );
+    settings.remove( mBaseKey + '/' + mOriginalConnName );
     settings.remove( "qgis//" + mCredentialsBaseKey + '/' + mOriginalConnName );
     settings.sync();
   }
@@ -110,4 +115,53 @@ void QgsGeoNodeNewConnection::okButtonBehavior( const QString &text )
   Q_UNUSED( text );
   buttonBox->button( QDialogButtonBox::Ok )->setDisabled( txtName->text().isEmpty() || txtUrl->text().isEmpty() );
   buttonBox->button( QDialogButtonBox::Ok )->setEnabled( !txtName->text().isEmpty() && !txtUrl->text().isEmpty() );
+}
+
+void QgsGeoNodeNewConnection::testConnection()
+{
+  QApplication::setOverrideCursor( Qt::BusyCursor );
+  QString endpoint( "/api/layers/" );
+  QNetworkReply *layersReply = request( endpoint );
+  endpoint = "/api/maps";
+  QNetworkReply *mapsReply = request( endpoint );
+  QApplication::restoreOverrideCursor();
+
+  if ( layersReply->error() == QNetworkReply::NoError && mapsReply->error() == QNetworkReply::NoError )
+  {
+    QMessageBox::information( this,
+                              tr( "Test connection" ),
+                              tr( "\nConnection to %1 was successful, \n\n%1 is a valid geonode instance.\n\n" ).arg( txtUrl->text() ) );
+  }
+  else
+  {
+    QMessageBox::information( this,
+                              tr( "Test connection" ),
+                              tr( "\nConnection failed, \n\nplease check whether %1 is a valid geonode instance.\n\n" ).arg( txtUrl->text() ) );
+  }
+}
+
+QNetworkReply *QgsGeoNodeNewConnection::request( QString &endPoint )
+{
+  QString url = txtUrl->text() + endPoint;
+  if ( !url.contains( QLatin1String( "://" ) ) )
+  {
+    url.prepend( "http://" );
+  }
+
+  QUrl layerUrl( url );
+  layerUrl.setScheme( "http" );
+  QgsNetworkAccessManager *networkManager = QgsNetworkAccessManager::instance();
+
+  QNetworkRequest request( layerUrl );
+  request.setHeader( QNetworkRequest::ContentTypeHeader, "application/json" );
+  // Handle redirect
+  // request.setAttribute( QNetworkRequest::FollowRedirectsAttribute, true );
+
+  QNetworkReply *reply = networkManager->get( request );
+  while ( !reply->isFinished() )
+  {
+    qApp->processEvents();
+  }
+
+  return reply;
 }

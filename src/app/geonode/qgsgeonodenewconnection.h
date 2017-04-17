@@ -6,24 +6,29 @@
 #define QGSGEONODENEWCONNECTION_H
 
 #include "ui_qgsnewgeonodeconnectionbase.h"
-#include "qgisgui.h"
+#include "qgsgui.h"
+#include "qgsguiutils.h"
+#include "qgis_app.h"
 #include "qgshelp.h"
 #include "qgsauthconfigselect.h"
 
-class QgsGeoNodeNewConnection : public QDialog, private Ui::QgsNewGeoNodeConnectionBase
+#include <QNetworkReply>
+
+class APP_EXPORT QgsGeoNodeNewConnection : public QDialog, private Ui::QgsNewGeoNodeConnectionBase
 {
     Q_OBJECT
 
   public:
     //! Constructor
-    QgsGeoNodeNewConnection( QWidget *parent = nullptr, const QString &connName = QString::null, Qt::WindowFlags fl = QgisGui::ModalDialogFlags );
+    QgsGeoNodeNewConnection( QWidget *parent = nullptr, const QString &connName = QString::null, Qt::WindowFlags fl = QgsGuiUtils::ModalDialogFlags );
 
-    //! Test the connection using the parameters supplied
-    void testConnection();
+    QNetworkReply *request( QString &endPoint );
 
   public slots:
     void accept() override;
     void okButtonBehavior( const QString & );
+    //! Test the connection using the parameters supplied
+    void testConnection();
 
   private:
     QString mBaseKey;
