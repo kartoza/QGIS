@@ -26,6 +26,7 @@
 #include "qgsxyzconnection.h"
 #include "qgsxyzconnectiondialog.h"
 #include "qgsgeonodeconnection.h"
+#include "qgssettings.h"
 
 #include <QInputDialog>
 
@@ -464,19 +465,6 @@ QgsDataItem *QgsWmsDataItemProvider::createDataItem( const QString &path, QgsDat
       return new QgsWMSConnectionItem( parentItem, QStringLiteral( "WMS" ), path, connection.uri().encodedUri() );
     }
   }
-  else if ( path.startsWith( QLatin1String( "geonode:/" ) ) )
-  {
-    QString connectionName = path.split( '/' ).last();
-    if ( QgsGeoNodeConnection::connectionList().contains( connectionName ) )
-    {
-      QgsGeoNodeConnection connection( connectionName );
-      QgsDataSourceUri sourceUri( connection.serviceUrl( QStringLiteral( "WFS" ) )[0] );
-
-      QgsDebugMsg( QString( "WMS full uri: '%1'." ).arg( QString( sourceUri.encodedUri() ) ) );
-
-      return new QgsWMSConnectionItem( parentItem, QStringLiteral( "WMS" ), path, sourceUri.encodedUri() );
-    }
-  }
 
   return nullptr;
 }
@@ -572,4 +560,83 @@ void QgsXyzLayerItem::deleteConnection()
   QgsXyzConnectionUtils::deleteConnection( mName );
 
   mParent->refresh();
+}
+
+
+// ---------------------------------------------------------------------------
+
+
+QVector<QgsDataItem *> QgsWmsDataItemProvider::createDataItems( const QString &path, QgsDataItem *parentItem )
+{
+  QVector<QgsDataItem *> items;
+  if ( path.startsWith( QLatin1String( "geonode:/" ) ) )
+  {
+    QString connectionName = path.split( '/' ).last();
+    if ( QgsGeoNodeConnection::connectionList().contains( connectionName ) )
+    {
+      QgsGeoNodeConnection connection( connectionName );
+      QStringList encodedUris( connection.serviceUrl( QStringLiteral( "WMS" ) ) );
+
+      if ( !encodedUris.isEmpty() )
+      {
+        Q_FOREACH ( QString encodedUri, encodedUris )
+        {
+          QgsDebugMsg( encodedUri );
+          QgsDataSourceUri uri;
+          QgsSettings settings;
+          QString key( connection.pathGeoNodeConnection + "/" + connectionName );
+
+          QString dpiMode = settings.value( key + "/wms/dpiMode", "all" ).toString();
+          uri.setParam( QStringLiteral( "url" ), encodedUri );
+          if ( !dpiMode.isEmpty() )
+          {
+            uri.setParam( QStringLiteral( "dpiMode" ), dpiMode );
+          }
+
+          QgsDebugMsg( QString( "WMS full uri: '%1'." ).arg( QString( uri.encodedUri() ) ) );
+
+          QgsDataItem *item = new QgsWMSConnectionItem( parentItem, QStringLiteral( "WMS" ), path, uri.encodedUri() );
+          if ( item )
+          {
+            items.append( item );
+          }
+        }
+      }
+    }
+  }
+
+  return items;
+}
+
+QVector<QgsDataItem *> QgsXyzTileDataItemProvider::createDataItems( const QString &path, QgsDataItem *parentItem )
+{
+  QVector<QgsDataItem *> items;
+  if ( path.startsWith( QLatin1String( "geonode:/" ) ) )
+  {
+    QString connectionName = path.split( '/' ).last();
+    if ( QgsGeoNodeConnection::connectionList().contains( connectionName ) )
+    {
+      QgsGeoNodeConnection connection( connectionName );
+      QVariantMap urlData( connection.serviceUrlData( QStringLiteral( "XYZ" ) ) );
+
+      if ( !urlData.isEmpty() )
+      {
+        Q_FOREACH ( QString layerName, urlData.keys() )
+        {
+          QgsDebugMsg( urlData[ layerName].toString() );
+          QgsDataSourceUri uri;
+          uri.setParam( QStringLiteral( "type" ), QStringLiteral( "xyz" ) );
+          uri.setParam( QStringLiteral( "url" ), urlData[ layerName].toString() );
+
+          QgsDataItem *item = new QgsXyzLayerItem( parentItem, layerName, path, uri.encodedUri() );
+          if ( item )
+          {
+            items.append( item );
+          }
+        }
+      }
+    }
+  }
+
+  return items;
 }

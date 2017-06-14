@@ -2,7 +2,7 @@
     qgsgeocmsconnection.h
     ---------------------
     begin                : Feb 2017
-    copyright            : (C) 2017 by Rohmat, Ismail Sunni
+    copyright            : (C) 2017 by Muhammad Yarjuna Rohmat, Ismail Sunni
     email                : rohmat at kartoza dot com, ismail at kartoza dot com
  ***************************************************************************
  *                                                                         *
@@ -24,6 +24,17 @@
 #include <QString>
 #include <QMultiMap>
 #include <QNetworkReply>
+
+struct LayerStruct
+{
+  QString uuid;
+  QString name;
+  QString typeName;
+  QString title;
+  QString wmsURL;
+  QString wfsURL;
+  QString xyzURL;
+};
 
 
 /** \ingroup core
@@ -59,13 +70,16 @@ class CORE_EXPORT QgsGeoCMSConnection : public QObject
     static void setSelectedConnection( const QString &geoCMSName, const QString &name );
 
     //! Return list of available layers
-    virtual QVariantList getLayers() = 0;
+    virtual QList<LayerStruct> getLayers() = 0;
+    virtual QList<LayerStruct> getLayers( QString serviceType ) = 0;
 
     //! Return list of available layers
     virtual QVariantList getMaps() = 0;
 
     //! Return available service urls
-    virtual QStringList serviceUrl() = 0;
+    //! Return WMS / WFS url for the layer / map / resource ID
+    virtual QStringList serviceUrl( QString &resourceID, QString serviceType ) = 0;
+    virtual QStringList serviceUrl( QString serviceType ) = 0;
 
     //! The GeoCMS name
     QString mGeoCMSName;

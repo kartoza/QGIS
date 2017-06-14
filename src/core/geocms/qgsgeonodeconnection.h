@@ -2,7 +2,7 @@
     qgsgeonodeconnection.h
     ---------------------
     begin                : Feb 2017
-    copyright            : (C) 2017 by Rohmat, Ismail Sunni
+    copyright            : (C) 2017 by Muhammad Yarjuna Rohmat, Ismail Sunni
     email                : rohmat at kartoza dot com, ismail at kartoza dot com
  ***************************************************************************
  *                                                                         *
@@ -21,9 +21,6 @@
 #include "qgsmaplayer.h"
 #include "qgsproject.h"
 #include "qgsgeocmsconnection.h"
-//#include "qgsstyle.h"
-//#include "../../providers/wms/qgswmsconnection.h"
-//#include "../../providers/wfs/qgswfsconnection.h"
 
 #include <QString>
 #include <QMultiMap>
@@ -57,18 +54,19 @@ class CORE_EXPORT QgsGeoNodeConnection : public QgsGeoCMSConnection
     static void setSelectedConnection( const QString &name );
 
     //! Return list of available layers
-    virtual QVariantList getLayers();
-    virtual QVariantList getLayers( QString serviceType );
+    virtual QList<LayerStruct> getLayers();
+    virtual QList<LayerStruct> getLayers( QString serviceType );
 
     //! Return list of available layers
     virtual QVariantList getMaps();
 
     //! Return WMS / WFS url for the layer / map / resource ID
-    virtual QStringList serviceUrl() {}
     virtual QStringList serviceUrl( QString &resourceID, QString serviceType );
 
     //! Return WMS / WFS url for the geonode
     virtual QStringList serviceUrl( QString serviceType );
+
+    QVariantMap serviceUrlData( QString serviceType );
 
     // Methods below can be moved to another class. I will put here first until I decide. (Ismail)
 

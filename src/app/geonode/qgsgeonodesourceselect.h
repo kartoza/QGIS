@@ -2,7 +2,7 @@
                               qgsgeonodesourceselect.h
                               -------------------
     begin                : Feb 2017
-    copyright            : (C) 2017 by Rohmat, Ismail Sunni
+    copyright            : (C) 2017 by Muhammad Yarjuna Rohmat, Ismail Sunni
     email                : rohmat at kartoza dot com, ismail at kartoza dot com
  ***************************************************************************/
 
@@ -45,7 +45,12 @@ class QgsGeoNodeSourceSelect: public QDialog, private Ui::QgsGeonodeSourceSelect
     void addRasterLayer( QString const &rasterLayerPath,
                          QString const &baseName,
                          QString const &providerKey );
-    void addWfsLayer( const QString &uri, const QString &layerName );
+    void addRasterLayer();
+
+    void addWfsLayer(
+      const QString &uri,
+      const QString &layerName,
+      QString const &providerKey );
 
   private:
     QgsGeoNodeSourceSelect(); //default constructor is forbidden

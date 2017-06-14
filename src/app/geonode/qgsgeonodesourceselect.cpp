@@ -2,7 +2,7 @@
                               qgsgeonodesourceselect.cpp
                               -------------------
     begin                : Feb 2017
-    copyright            : (C) 2017 by Rohmat, Ismail Sunni
+    copyright            : (C) 2017 by Muhammad Yarjuna Rohmat, Ismail Sunni
     email                : rohmat at kartoza dot com, ismail at kartoza dot com
  ***************************************************************************/
 
@@ -20,6 +20,8 @@
 #include "qgsgeonodenewconnection.h"
 #include "qgsmanageconnectionsdialog.h"
 #include "qgslogger.h"
+#include "qgsmessagelog.h"
+#include "qgsproviderregistry.h"
 
 #include <QDomDocument>
 #include <QListWidgetItem>
@@ -40,9 +42,11 @@ QgsGeoNodeSourceSelect::QgsGeoNodeSourceSelect( QWidget *parent, Qt::WindowFlags
 {
   setupUi( this );
 
-  if ( embeddedMode )
+  if ( embeddedMode != QgsProviderRegistry::WidgetMode::None )
   {
-    buttonBox->button( QDialogButtonBox::Close )->hide();
+    // For some osbscure reason hiding does not work!
+    // buttonBox->button( QDialogButtonBox::Close )->hide();
+    buttonBox->removeButton( buttonBox->button( QDialogButtonBox::Close ) );
   }
 
   mAddButton = new QPushButton( tr( "&Add" ) );
@@ -184,21 +188,7 @@ void QgsGeoNodeSourceSelect::connectToGeonodeConnection()
   QApplication::setOverrideCursor( Qt::BusyCursor );
   QgsGeoNodeConnection connection( cmbConnections->currentText() );
 
-  QVariantList layers = connection.getLayers();
-
-//  QVariantList validWMSLayer = connection.getLayers( QStringLiteral( "WMS" ) );
-//  QVariantList validWFSLayer = connection.getLayers( QStringLiteral( "WFS" ) );
-
-//  QVariantList validWMSLayerNames = QVariantList();
-//  Q_FOREACH ( const QVariant &wmsLayer, validWMSLayer )
-//  {
-//    validWMSLayerNames.append( wmsLayer.toMap()["name"] );
-//  }
-//  QVariantList validWFSLayerNames = QVariantList();
-//  Q_FOREACH ( const QVariant &wfsLayer, validWFSLayer )
-//  {
-//    validWFSLayerNames.append( wfsLayer.toMap()["name"] );
-//  }
+  QList<LayerStruct> layers = connection.getLayers();
 
   if ( mModel )
   {
@@ -207,32 +197,32 @@ void QgsGeoNodeSourceSelect::connectToGeonodeConnection()
 
   if ( !layers.isEmpty() )
   {
-    Q_FOREACH ( const QVariant &layer, layers )
+    Q_FOREACH ( const LayerStruct &layer, layers )
     {
-      QString uuid = layer.toMap()["uuid"].toString();
+      QString uuid = layer.uuid;
 
-      QString layerName = layer.toMap()["name"].toString();
+      QString layerName = layer.name;
 
-      QString wmsURL = layer.toMap()["wms"].toString();
-      QString wfsURL = layer.toMap()["wfs"].toString();
-      QString xyzURL = layer.toMap()["xyz"].toString();
+      QString wmsURL = layer.wmsURL;
+      QString wfsURL = layer.wfsURL;
+      QString xyzURL = layer.xyzURL;
 
       if ( wmsURL.length() > 0 )
       {
-        QStandardItem *titleItem = new QStandardItem( layer.toMap()["title"].toString() );
+        QStandardItem *titleItem = new QStandardItem( layer.title );
         QStandardItem *nameItem;
-        if ( layer.toMap()["name"].toString().length() > 0 )
+        if ( layer.name > 0 )
         {
-          nameItem = new QStandardItem( layer.toMap()["name"].toString() );
+          nameItem = new QStandardItem( layer.name );
         }
         else
         {
-          nameItem = new QStandardItem( layer.toMap()["title"].toString() );
+          nameItem = new QStandardItem( layer.title );
         }
         QStandardItem *serviceTypeItem = new QStandardItem( tr( "Layer" ) );
         QStandardItem *webServiceTypeItem = new QStandardItem( tr( "WMS" ) );
 
-        QString typeName = layer.toMap()["typename"].toString();
+        QString typeName = layer.typeName;
 
         titleItem->setData( uuid,  Qt::UserRole + 1 );
         titleItem->setData( wmsURL,  Qt::UserRole + 2 );
@@ -242,24 +232,24 @@ void QgsGeoNodeSourceSelect::connectToGeonodeConnection()
       }
       else
       {
-        qDebug() << "Layer " << layer.toMap()["title"].toString() << " does not have WMS url.";
+        qDebug() << "Layer " << layer.title << " does not have WMS url.";
       }
       if ( wfsURL.length() > 0 )
       {
-        QStandardItem *titleItem = new QStandardItem( layer.toMap()["title"].toString() );
+        QStandardItem *titleItem = new QStandardItem( layer.title );
         QStandardItem *nameItem;
-        if ( layer.toMap()["name"].toString().length() > 0 )
+        if ( layer.name.length() > 0 )
         {
-          nameItem = new QStandardItem( layer.toMap()["name"].toString() );
+          nameItem = new QStandardItem( layer.name );
         }
         else
         {
-          nameItem = new QStandardItem( layer.toMap()["title"].toString() );
+          nameItem = new QStandardItem( layer.title );
         }
         QStandardItem *serviceTypeItem = new QStandardItem( tr( "Layer" ) );
         QStandardItem *webServiceTypeItem = new QStandardItem( tr( "WFS" ) );
 
-        QString typeName = layer.toMap()["typename"].toString();
+        QString typeName = layer.typeName;
 
         titleItem->setData( uuid,  Qt::UserRole + 1 );
         titleItem->setData( wfsURL,  Qt::UserRole + 2 );
@@ -269,24 +259,24 @@ void QgsGeoNodeSourceSelect::connectToGeonodeConnection()
       }
       else
       {
-        qDebug() << "Layer " << layer.toMap()["title"].toString() << " does not have WFS url.";
+        qDebug() << "Layer " << layer.title << " does not have WFS url.";
       }
       if ( xyzURL.length() > 0 )
       {
-        QStandardItem *titleItem = new QStandardItem( layer.toMap()["title"].toString() );
+        QStandardItem *titleItem = new QStandardItem( layer.title );
         QStandardItem *nameItem;
-        if ( layer.toMap()["name"].toString().length() > 0 )
+        if ( layer.name.length() > 0 )
         {
-          nameItem = new QStandardItem( layer.toMap()["name"].toString() );
+          nameItem = new QStandardItem( layer.name );
         }
         else
         {
-          nameItem = new QStandardItem( layer.toMap()["title"].toString() );
+          nameItem = new QStandardItem( layer.title );
         }
         QStandardItem *serviceTypeItem = new QStandardItem( tr( "Layer" ) );
         QStandardItem *webServiceTypeItem = new QStandardItem( tr( "XYZ" ) );
 
-        QString typeName = layer.toMap()["typename"].toString();
+        QString typeName = layer.typeName;
 
         titleItem->setData( uuid,  Qt::UserRole + 1 );
         titleItem->setData( xyzURL,  Qt::UserRole + 2 );
@@ -296,7 +286,7 @@ void QgsGeoNodeSourceSelect::connectToGeonodeConnection()
       }
       else
       {
-        qDebug() << "Layer " << layer.toMap()["title"].toString() << " does not have XYZ url.";
+        qDebug() << "Layer " << layer.title << " does not have XYZ url.";
       }
     }
   }
@@ -309,30 +299,6 @@ void QgsGeoNodeSourceSelect::connectToGeonodeConnection()
     box->setObjectName( QStringLiteral( "GeonodeCapabilitiesErrorBox" ) );
     box->open();
   }
-
-  // Currently we don't have obvious way to add Map, comment these lines until the time comes.
-//  QVariantList maps = connection.getMaps();
-//  if ( !maps.isEmpty() )
-//  {
-//    Q_FOREACH ( const QVariant &map, maps )
-//    {
-//      QStandardItem *titleItem = new QStandardItem( map.toMap()["title"].toString() );
-//      QStandardItem *nameItem = new QStandardItem( "-" );
-//      QStandardItem *serviceTypeItem = new QStandardItem( tr( "Map" ) );
-//      QStandardItem *webServiceTypeItem = new QStandardItem( tr( "WMS" ) );
-//      typedef QList< QStandardItem * > StandardItemList;
-//      mModel->appendRow( StandardItemList() << titleItem << nameItem << serviceTypeItem << webServiceTypeItem );
-//    }
-//  }
-
-//  else
-//  {
-//    QMessageBox *box = new QMessageBox( QMessageBox::Critical, tr( "Error" ), tr( "Cannot get any map services" ), QMessageBox::Ok, this );
-//    box->setAttribute( Qt::WA_DeleteOnClose );
-//    box->setModal( true );
-//    box->setObjectName( QStringLiteral( "GeonodeCapabilitiesErrorBox" ) );
-//    box->open();
-//  }
 
   treeView->resizeColumnToContents( MODEL_IDX_TITLE );
   treeView->resizeColumnToContents( MODEL_IDX_NAME );
@@ -483,12 +449,24 @@ void QgsGeoNodeSourceSelect::addButtonClicked()
       // Build url for WFS
       // restrictToRequestBBOX='1' srsname='EPSG:26719' typename='geonode:cab_mun' url='http://demo.geonode.org/geoserver/geonode/wms' table=\"\" sql="
       QString uri;
-      uri += QStringLiteral( " srsname='%1'" ).arg( crs ) ;
-      uri += QStringLiteral( " typename='%1'" ).arg( typeName ) ;
+      uri += QStringLiteral( " restrictToRequestBBOX='1'" );
+      uri += QStringLiteral( " srsname='%1'" ).arg( crs );
+      if ( serviceURL.contains( "qgis-server" ) )
+      {
+        // I need to do this since the typename used in qgis-server is without the workspace.
+        QString qgisServerTypeName = QString( typeName ).split( ":" ).last();
+        uri += QStringLiteral( " typename='%1'" ).arg( qgisServerTypeName );
+      }
+      else
+      {
+        uri += QStringLiteral( " typename='%1'" ).arg( typeName );
+      }
       uri += QStringLiteral( " url='%1'" ).arg( serviceURL );
+      uri += QStringLiteral( " table=\"\"" );
+      uri += QStringLiteral( " sql=" );
 
-      QgsDebugMsg( "Add WFS from GeoNode : " + uri );
-      emit addWfsLayer( uri, typeName );
+      QgsMessageLog::logMessage( "Add WFS from GeoNode : " + uri + " and typename: " + typeName, tr( "GeoNode" ) );
+      emit addWfsLayer( uri, typeName, "WFS" );
     }
     else if ( webServiceType == "XYZ" )
     {
@@ -504,9 +482,4 @@ void QgsGeoNodeSourceSelect::addButtonClicked()
   }
 
   QApplication::restoreOverrideCursor();
-
-  if ( !mHoldDialogOpen->isChecked() )
-  {
-    accept();
-  }
 }

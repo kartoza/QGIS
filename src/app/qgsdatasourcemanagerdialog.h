@@ -81,6 +81,8 @@ class QgsDataSourceManagerDialog : public QgsOptionsDialogBase
     void updateProjectHome();
 
   private:
+    //! Add dialog manually
+    QDialog *addDialog( QDialog *dialog, QString const key, QString const name, QString const icon, QString title = QString() );
     //! Return the dialog from the provider
     QDialog *providerDialog( QString const providerKey, QString const providerName, QString const icon, QString title = QString( ) );
     void addDbProviderDialog( QString const providerKey, QString const providerName, QString const icon, QString title = QString( ) );

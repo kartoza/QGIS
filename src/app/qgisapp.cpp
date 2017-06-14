@@ -1854,8 +1854,6 @@ void QgisApp::createActions()
 
   // Web Menu Items
 
-  connect( mActionAddGeonodeLayer, &QAction::triggered, this, &QgisApp::addGeonodeLayer );
-
   // Layer Menu Items
 
   connect( mActionDataSourceManager, &QAction::triggered, this, [ = ]( ) { dataSourceManager( ); } );
@@ -1881,6 +1879,7 @@ void QgisApp::createActions()
   connect( mActionAddAmsLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "arcgismapserver" ) ); } );
   connect( mActionAddDelimitedText, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "delimitedtext" ) ); } );
   connect( mActionAddVirtualLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "virtual" ) ); } );
+  connect( mActionAddGeonodeLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "geonode" ) ); } );
   connect( mActionOpenTable, &QAction::triggered, this, &QgisApp::attributeTable );
   connect( mActionOpenFieldCalc, &QAction::triggered, this, &QgisApp::fieldCalculator );
   connect( mActionToggleEditing, &QAction::triggered, this, [ = ] { toggleEditing(); } );
@@ -4462,8 +4461,8 @@ void QgisApp::addGeonodeLayer()
     QMessageBox::warning( this, tr( "Geonode" ), tr( "Cannot get Geonode select dialog." ) );
     return;
   }
-  connect( geonodes, SIGNAL( addRasterLayer( QString const &, QString const &, QString const & ) ),
-           this, SLOT( addRasterLayer( QString const &, QString const &, QString const & ) ) );
+  connect( geonodes, static_cast<void ( QgsGeoNodeSourceSelect::* )()>( &QgsGeoNodeSourceSelect::addRasterLayer ), this, static_cast<void ( QgisApp::* )()>( &QgisApp::addRasterLayer ) );
+  connect( geonodes, &QgsGeoNodeSourceSelect::addWfsLayer, this, &QgisApp::addVectorLayer );
   geonodes->exec();
   delete geonodes;
 }
