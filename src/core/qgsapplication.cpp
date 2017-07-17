@@ -637,6 +637,11 @@ QString QgsApplication::i18nPath()
     return ABISYM( mPkgDataPath ) + QStringLiteral( "/i18n/" );
 }
 
+QString QgsApplication::metadataPath()
+{
+  return ABISYM( mPkgDataPath ) + QStringLiteral( "/resources/metadata-ISO/" );
+}
+
 QString QgsApplication::qgisMasterDatabaseFilePath()
 {
   return ABISYM( mPkgDataPath ) + QStringLiteral( "/resources/qgis.db" );
