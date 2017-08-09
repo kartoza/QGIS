@@ -1929,7 +1929,6 @@ void QgisApp::createActions()
   connect( mActionAddAmsLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "arcgismapserver" ) ); } );
   connect( mActionAddDelimitedText, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "delimitedtext" ) ); } );
   connect( mActionAddVirtualLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "virtual" ) ); } );
-  connect( mActionOpenMetadataWizardEditor, &QAction::triggered, this, &QgisApp::metadataWizard );
   connect( mActionOpenTable, &QAction::triggered, this, &QgisApp::attributeTable );
   connect( mActionOpenFieldCalc, &QAction::triggered, this, &QgisApp::fieldCalculator );
   connect( mActionToggleEditing, &QAction::triggered, this, [ = ] { toggleEditing(); } );
@@ -4686,17 +4685,6 @@ void QgisApp::addVirtualLayer()
   dts->exec();
   delete dts;
 } // QgisApp::addVirtualLayer()
-
-void QgisApp::metadataWizard()
-{
-  QgsMapLayer *myLayer = activeLayer();
-  if ( !myLayer )
-  {
-    return;
-  }
-  QgsMetadataWizard wizard( this, myLayer );
-  wizard.exec();
-} // QgisApp::metadataWizard()
 
 void QgisApp::addSelectedVectorLayer( const QString &uri, const QString &layerName, const QString &provider )
 {
@@ -11055,7 +11043,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
     mActionSelectByForm->setEnabled( false );
     mActionLabeling->setEnabled( false );
     mActionOpenTable->setEnabled( false );
-    mActionOpenMetadataWizardEditor->setEnabled( false );
     mActionSelectAll->setEnabled( false );
     mActionInvertSelection->setEnabled( false );
     mActionOpenFieldCalc->setEnabled( false );
@@ -11163,7 +11150,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
     mActionSelectByExpression->setEnabled( true );
     mActionSelectByForm->setEnabled( true );
     mActionOpenTable->setEnabled( true );
-    mActionOpenMetadataWizardEditor->setEnabled( true );
     mActionSelectAll->setEnabled( true );
     mActionInvertSelection->setEnabled( true );
     mActionSaveLayerDefinition->setEnabled( true );
@@ -11360,7 +11346,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
     mActionZoomToLayer->setEnabled( true );
     mActionZoomToSelected->setEnabled( false );
     mActionOpenTable->setEnabled( false );
-    mActionOpenMetadataWizardEditor->setEnabled( true );
     mActionSelectAll->setEnabled( false );
     mActionInvertSelection->setEnabled( false );
     mActionSelectByExpression->setEnabled( false );
