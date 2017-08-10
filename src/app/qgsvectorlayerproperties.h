@@ -24,6 +24,7 @@
 #include "qgsguiutils.h"
 #include "qgshelp.h"
 #include "qgsmaplayerstylemanager.h"
+#include "qgsmetadatawidget.h"
 #include "qgsvectorlayer.h"
 #include "layertree/qgslayertreemodel.h"
 #include "layertree/qgslayertreegroup.h"
@@ -198,6 +199,8 @@ class APP_EXPORT QgsVectorLayerProperties : public QgsOptionsDialogBase, private
 
     std::unique_ptr<QgsLayerTree> mLayersDependenciesTreeGroup;
     std::unique_ptr<QgsLayerTreeModel> mLayersDependenciesTreeModel;
+
+    QgsMetadataWidget *mMetadataWidget = nullptr;
 
   private slots:
     void openPanel( QgsPanelWidget *panel );

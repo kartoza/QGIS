@@ -252,6 +252,14 @@ QgsVectorLayerProperties::QgsVectorLayerProperties(
   diagLayout->addWidget( diagramPropertiesDialog );
   mDiagramFrame->setLayout( diagLayout );
 
+  // Metadata tab
+  QVBoxLayout *metadataLayout = new QVBoxLayout( metadataFrame );
+  metadataLayout->setMargin( 0 );
+  mMetadataWidget = new QgsMetadataWidget( this, mLayer );
+  mMetadataWidget->layout()->setContentsMargins( -1, 0, -1, 0 );
+  metadataLayout->addWidget( mMetadataWidget );
+  metadataFrame->setLayout( metadataLayout );
+
   // Legend tab
   mLegendConfigEmbeddedWidget->setLayer( mLayer );
 
@@ -493,6 +501,9 @@ void QgsVectorLayerProperties::apply()
 
   // apply legend settings
   mLegendConfigEmbeddedWidget->applyToLayer();
+
+  // save metadata
+  mMetadataWidget->saveMetadata();
 
   //
   // Set up sql subset query if applicable
