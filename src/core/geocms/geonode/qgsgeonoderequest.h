@@ -21,6 +21,63 @@
 #include <QDomDocument>
 #include <QObject>
 #include <QUuid>
+#include "qgsauthmanager.h"
+
+struct CORE_EXPORT QgsGeoNodeAuthorization
+{
+#ifdef SIP_RUN
+  % TypeHeaderCode
+#include <qgsgeonoderequest.h>
+  % End
+#endif
+
+  QgsGeoNodeAuthorization( const QString &userName = QString(), const QString &password = QString(), const QString &referer = QString(), const QString &authcfg = QString() )
+    : mUserName( userName )
+    , mPassword( password )
+    , mReferer( referer )
+    , mAuthCfg( authcfg )
+  {}
+
+  bool setAuthorization( QNetworkRequest &request ) const
+  {
+    if ( !mAuthCfg.isEmpty() )
+    {
+      return QgsAuthManager::instance()->updateNetworkRequest( request, mAuthCfg );
+    }
+    else if ( !mUserName.isNull() || !mPassword.isNull() )
+    {
+      request.setRawHeader( "Authorization", "Basic " + QStringLiteral( "%1:%2" ).arg( mUserName, mPassword ).toLatin1().toBase64() );
+    }
+
+    if ( !mReferer.isNull() )
+    {
+      request.setRawHeader( "Referer", QStringLiteral( "%1" ).arg( mReferer ).toLatin1() );
+    }
+    return true;
+  }
+  //! set authorization reply
+  bool setAuthorizationReply( QNetworkReply *reply ) const
+  {
+    if ( !mAuthCfg.isEmpty() )
+    {
+      return QgsAuthManager::instance()->updateNetworkReply( reply, mAuthCfg );
+    }
+    return true;
+  }
+
+  //! Username for basic http authentication
+  QString mUserName;
+
+  //! Password for basic http authentication
+  QString mPassword;
+
+  //! Referer for http requests
+  QString mReferer;
+
+  //! Authentication configuration ID
+  QString mAuthCfg;
+};
+
 
 /**
  * \ingroup core

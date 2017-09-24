@@ -7,6 +7,46 @@
  ************************************************************************/
 
 
+struct QgsGeoNodeAuthorization
+{
+%TypeHeaderCode
+#include <qgsgeonoderequest.h>
+%End
+
+  QgsGeoNodeAuthorization( const QString &userName = QString(), const QString &password = QString(), const QString &referer = QString(), const QString &authcfg = QString() );
+
+  bool setAuthorization( QNetworkRequest &request ) const;
+%Docstring
+ :rtype: bool
+%End
+  bool setAuthorizationReply( QNetworkReply *reply ) const;
+%Docstring
+set authorization reply
+ :rtype: bool
+%End
+
+  QString mUserName;
+%Docstring
+Username for basic http authentication
+%End
+
+  QString mPassword;
+%Docstring
+Password for basic http authentication
+%End
+
+  QString mReferer;
+%Docstring
+Referer for http requests
+%End
+
+  QString mAuthCfg;
+%Docstring
+Authentication configuration ID
+%End
+};
+
+
 struct QgsGeoNodeStyle
 {
 %TypeHeaderCode
