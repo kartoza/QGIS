@@ -150,7 +150,7 @@ class CORE_EXPORT QgsGeoNodeRequest : public QObject
      *
      * If \a forceRefresh is false, then cached copies of the request may be reused.
      */
-    QgsGeoNodeRequest( const QString &baseUrl, bool forceRefresh, QObject *parent = nullptr );
+    QgsGeoNodeRequest( const QString &baseUrl, bool forceRefresh, QgsGeoNodeAuthorization *geonodeAuth = nullptr, QObject *parent = nullptr );
 
     virtual ~QgsGeoNodeRequest();
 
@@ -270,6 +270,9 @@ class CORE_EXPORT QgsGeoNodeRequest : public QObject
      */
     void setProtocol( const QString &protocol );
 
+    QgsGeoNodeAuthorization auth();
+    void setAuth( QgsGeoNodeAuthorization auth );
+
   public slots:
 
     /**
@@ -317,6 +320,9 @@ class CORE_EXPORT QgsGeoNodeRequest : public QObject
 
     //! Response
     QByteArray mHttpGeoNodeResponse;
+
+    //! Authorization for GeoNode
+    QgsGeoNodeAuthorization mAuth;
 
     bool mIsAborted = false;
     bool mForceRefresh = false;

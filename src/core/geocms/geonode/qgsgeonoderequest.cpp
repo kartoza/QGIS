@@ -27,12 +27,16 @@
 #include <QUrl>
 #include <QDomDocument>
 
-QgsGeoNodeRequest::QgsGeoNodeRequest( const QString &baseUrl, bool forceRefresh, QObject *parent )
+QgsGeoNodeRequest::QgsGeoNodeRequest( const QString &baseUrl, bool forceRefresh, QgsGeoNodeAuthorization *geonodeAuth, QObject *parent )
   : QObject( parent )
   , mBaseUrl( baseUrl )
   , mForceRefresh( forceRefresh )
 {
+  // For testing only
+  geonodeAuth->mUserName = QStringLiteral( "admin" );
+  geonodeAuth->mPassword = QStringLiteral( "admin" );
 
+  setAuth( *geonodeAuth );
 }
 
 QgsGeoNodeRequest::~QgsGeoNodeRequest()
@@ -149,6 +153,16 @@ void QgsGeoNodeRequest::replyProgress( qint64 bytesReceived, qint64 bytesTotal )
   QString msg = tr( "%1 of %2 bytes of request downloaded." ).arg( bytesReceived ).arg( bytesTotal < 0 ? QStringLiteral( "unknown number of" ) : QString::number( bytesTotal ) );
   QgsDebugMsgLevel( msg, 3 );
   emit statusChanged( msg );
+}
+
+QgsGeoNodeAuthorization QgsGeoNodeRequest::auth()
+{
+  return mAuth;
+}
+
+void QgsGeoNodeRequest::setAuth( QgsGeoNodeAuthorization auth )
+{
+  mAuth = auth;
 }
 
 QString QgsGeoNodeRequest::protocol() const
@@ -523,6 +537,13 @@ QNetworkReply *QgsGeoNodeRequest::requestUrl( const QString &url )
 
   request.setAttribute( QNetworkRequest::CacheLoadControlAttribute, mForceRefresh ? QNetworkRequest::AlwaysNetwork : QNetworkRequest::PreferCache );
   request.setAttribute( QNetworkRequest::CacheSaveControlAttribute, true );
+
+
+  if ( mAuth.setAuthorization( request ) )
+  {
+    QgsMessageLog::logMessage( QStringLiteral( "Error auth" ), QStringLiteral( "GeoNode" ) );
+    return nullptr;
+  }
 
   return QgsNetworkAccessManager::instance()->get( request );
 }

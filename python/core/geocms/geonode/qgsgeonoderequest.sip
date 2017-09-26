@@ -127,7 +127,7 @@ XYZ tileserver URL for layer
 %End
     };
 
-    QgsGeoNodeRequest( const QString &baseUrl, bool forceRefresh, QObject *parent = 0 );
+    QgsGeoNodeRequest( const QString &baseUrl, bool forceRefresh, QgsGeoNodeAuthorization *geonodeAuth = 0, QObject *parent = 0 );
 %Docstring
  Constructor for QgsGeoNodeRequest.
 
@@ -260,6 +260,12 @@ XYZ tileserver URL for layer
  Sets the network ``protocol`` (e.g. 'http') used for connecting with the server.
 .. seealso:: protocol()
 %End
+
+    QgsGeoNodeAuthorization auth();
+%Docstring
+ :rtype: QgsGeoNodeAuthorization
+%End
+    void setAuth( QgsGeoNodeAuthorization auth );
 
   public slots:
 
