@@ -3431,6 +3431,16 @@ static QVariant fcnGetFeature( const QVariantList &values, const QgsExpressionCo
   return QVariant();
 }
 
+static QVariant fcnGetLayer( const QVariantList &values, const QgsExpressionContext *, QgsExpression *parent )
+{
+  QgsMapLayer *layer = QgsExpressionUtils::getMapLayer( values.at( 0 ), parent );
+
+  if ( !layer )
+    return QVariant();
+  else
+    return QVariant::fromValue( layer );
+}
+
 static QVariant fcnRepresentValue( const QVariantList &values, const QgsExpressionContext *context, QgsExpression *parent, const QgsExpressionNodeFunction *node )
 {
   QVariant result;
@@ -4309,6 +4319,7 @@ const QList<QgsExpressionFunction *> &QgsExpression::Functions()
     sFunctions << uuidFunc;
 
     sFunctions
+        << new QgsStaticExpressionFunction( QStringLiteral( "get_layer" ), 1, fcnGetLayer, QStringLiteral( "Record" ), QString(), false, QSet<QString>(), false, QStringList() << QStringLiteral( "QgsExpressionUtils::getLayer" ) )
         << new QgsStaticExpressionFunction( QStringLiteral( "get_feature" ), 3, fcnGetFeature, QStringLiteral( "Record and Attributes" ), QString(), false, QSet<QString>(), false, QStringList() << QStringLiteral( "QgsExpressionUtils::getFeature" ) )
         << new QgsStaticExpressionFunction( QStringLiteral( "get_feature_by_id" ), 2, fcnGetFeatureById, QStringLiteral( "Record and Attributes" ), QString(), false, QSet<QString>(), false );
 

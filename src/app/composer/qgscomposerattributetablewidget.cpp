@@ -77,6 +77,9 @@ QgsComposerAttributeTableWidget::QgsComposerAttributeTableWidget( QgsComposerAtt
 
   blockAllSignals( true );
 
+  registerDataDefinedButton( mLayerComboDDBtn, QgsComposerObject::LayerAttributeTable );
+  connect( mLayerComboDDBtn, &QgsPropertyOverrideButton::activated, mLayerComboBox, &QgsMapLayerComboBox::setDisabled );
+
   mResizeModeComboBox->addItem( tr( "Use existing frames" ), QgsComposerMultiFrame::UseExistingFrames );
   mResizeModeComboBox->addItem( tr( "Extend to next page" ), QgsComposerMultiFrame::ExtendToNextPage );
   mResizeModeComboBox->addItem( tr( "Repeat until finished" ), QgsComposerMultiFrame::RepeatUntilFinished );
@@ -1094,6 +1097,8 @@ void QgsComposerAttributeTableWidget::toggleSourceControls()
     case QgsComposerAttributeTableV2::LayerAttributes:
       mLayerComboBox->setEnabled( true );
       mLayerComboBox->setVisible( true );
+      mLayerComboDDBtn->setVisible( true );
+      mLayerComboBox->setEnabled( ! mLayerComboDDBtn->isActive() );
       mLayerLabel->setVisible( true );
       mRelationsComboBox->setEnabled( false );
       mRelationsComboBox->setVisible( false );
@@ -1107,6 +1112,7 @@ void QgsComposerAttributeTableWidget::toggleSourceControls()
     case QgsComposerAttributeTableV2::AtlasFeature:
       mLayerComboBox->setEnabled( false );
       mLayerComboBox->setVisible( false );
+      mLayerComboDDBtn->setVisible( false );
       mLayerLabel->setVisible( false );
       mRelationsComboBox->setEnabled( false );
       mRelationsComboBox->setVisible( false );
@@ -1120,6 +1126,7 @@ void QgsComposerAttributeTableWidget::toggleSourceControls()
     case QgsComposerAttributeTableV2::RelationChildren:
       mLayerComboBox->setEnabled( false );
       mLayerComboBox->setVisible( false );
+      mLayerComboDDBtn->setVisible( false );
       mLayerLabel->setVisible( false );
       mRelationsComboBox->setEnabled( true );
       mRelationsComboBox->setVisible( true );

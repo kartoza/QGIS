@@ -75,6 +75,8 @@ class CORE_EXPORT QgsComposerObject: public QObject, public QgsExpressionContext
       MapAtlasMargin, //!< Map atlas margin
       MapLayers, //!< Map layer set
       MapStylePreset, //!< Layer and style map theme
+      // attribute table
+      LayerAttributeTable, //!< Vector layer attribute table
       //composer picture
       PictureSource, //!< Picture source url
       PictureSvgBackgroundColor, //!< SVG background color

@@ -54,6 +54,8 @@ class QgsComposerObject: QObject, QgsExpressionContextGenerator
       MapAtlasMargin,
       MapLayers,
       MapStylePreset,
+      // attribute
+      LayerAttributeTable,
       //composer
       PictureSource,
       PictureSvgBackgroundColor,
