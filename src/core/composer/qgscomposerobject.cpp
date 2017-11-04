@@ -63,6 +63,7 @@ void QgsComposerObject::initPropertyDefinitions()
     { QgsComposerObject::MapXMax, QgsPropertyDefinition( "dataDefinedMapXMax", QObject::tr( "Extent maximum X" ), QgsPropertyDefinition::Double ) },
     { QgsComposerObject::MapYMax, QgsPropertyDefinition( "dataDefinedMapYMax", QObject::tr( "Extent maximum Y" ), QgsPropertyDefinition::Double ) },
     { QgsComposerObject::MapAtlasMargin, QgsPropertyDefinition( "dataDefinedMapAtlasMargin", QObject::tr( "Atlas margin" ), QgsPropertyDefinition::DoublePositive ) },
+    { QgsComposerObject::LayerAttributeTable, QgsPropertyDefinition( "dataDefinedVectorLayerAttributeTable", QgsPropertyDefinition::DataTypeString, QObject::tr( "Layer Attribute Table" ), tr( "map layer name" ) ) },
     { QgsComposerObject::MapLayers, QgsPropertyDefinition( "dataDefinedMapLayers", QgsPropertyDefinition::DataTypeString, QObject::tr( "Symbol size" ), tr( "list of map layer names separated by | characters" ) ) },
     { QgsComposerObject::MapStylePreset, QgsPropertyDefinition( "dataDefinedMapStylePreset", QgsPropertyDefinition::DataTypeString, QObject::tr( "Symbol size" ), tr( "list of map layer names separated by | characters" ) ) },
     { QgsComposerObject::PictureSource, QgsPropertyDefinition( "dataDefinedSource", QObject::tr( "Picture source (URL)" ), QgsPropertyDefinition::String ) },

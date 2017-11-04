@@ -38,12 +38,47 @@ QgsComposerAttributeTableWidget::QgsComposerAttributeTableWidget( QgsComposerAtt
   , mFrame( frame )
 {
   setupUi( this );
+  connect( mRefreshPushButton, &QPushButton::clicked, this, &QgsComposerAttributeTableWidget::mRefreshPushButton_clicked );
+  connect( mAttributesPushButton, &QPushButton::clicked, this, &QgsComposerAttributeTableWidget::mAttributesPushButton_clicked );
+  connect( mMaximumRowsSpinBox, static_cast < void ( QSpinBox::* )( int ) > ( &QSpinBox::valueChanged ), this, &QgsComposerAttributeTableWidget::mMaximumRowsSpinBox_valueChanged );
+  connect( mMarginSpinBox, static_cast < void ( QDoubleSpinBox::* )( double ) > ( &QDoubleSpinBox::valueChanged ), this, &QgsComposerAttributeTableWidget::mMarginSpinBox_valueChanged );
+  connect( mGridStrokeWidthSpinBox, static_cast < void ( QDoubleSpinBox::* )( double ) > ( &QDoubleSpinBox::valueChanged ), this, &QgsComposerAttributeTableWidget::mGridStrokeWidthSpinBox_valueChanged );
+  connect( mGridColorButton, &QgsColorButton::colorChanged, this, &QgsComposerAttributeTableWidget::mGridColorButton_colorChanged );
+  connect( mBackgroundColorButton, &QgsColorButton::colorChanged, this, &QgsComposerAttributeTableWidget::mBackgroundColorButton_colorChanged );
+  connect( mHeaderFontColorButton, &QgsColorButton::colorChanged, this, &QgsComposerAttributeTableWidget::mHeaderFontColorButton_colorChanged );
+  connect( mContentFontColorButton, &QgsColorButton::colorChanged, this, &QgsComposerAttributeTableWidget::mContentFontColorButton_colorChanged );
+  connect( mDrawHorizontalGrid, &QCheckBox::toggled, this, &QgsComposerAttributeTableWidget::mDrawHorizontalGrid_toggled );
+  connect( mDrawVerticalGrid, &QCheckBox::toggled, this, &QgsComposerAttributeTableWidget::mDrawVerticalGrid_toggled );
+  connect( mShowGridGroupCheckBox, &QgsCollapsibleGroupBoxBasic::toggled, this, &QgsComposerAttributeTableWidget::mShowGridGroupCheckBox_toggled );
+  connect( mShowOnlyVisibleFeaturesCheckBox, &QCheckBox::stateChanged, this, &QgsComposerAttributeTableWidget::mShowOnlyVisibleFeaturesCheckBox_stateChanged );
+  connect( mFeatureFilterCheckBox, &QCheckBox::stateChanged, this, &QgsComposerAttributeTableWidget::mFeatureFilterCheckBox_stateChanged );
+  connect( mFeatureFilterEdit, &QLineEdit::editingFinished, this, &QgsComposerAttributeTableWidget::mFeatureFilterEdit_editingFinished );
+  connect( mFeatureFilterButton, &QToolButton::clicked, this, &QgsComposerAttributeTableWidget::mFeatureFilterButton_clicked );
+  connect( mHeaderHAlignmentComboBox, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsComposerAttributeTableWidget::mHeaderHAlignmentComboBox_currentIndexChanged );
+  connect( mHeaderModeComboBox, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsComposerAttributeTableWidget::mHeaderModeComboBox_currentIndexChanged );
+  connect( mWrapStringLineEdit, &QLineEdit::editingFinished, this, &QgsComposerAttributeTableWidget::mWrapStringLineEdit_editingFinished );
+  connect( mAddFramePushButton, &QPushButton::clicked, this, &QgsComposerAttributeTableWidget::mAddFramePushButton_clicked );
+  connect( mResizeModeComboBox, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsComposerAttributeTableWidget::mResizeModeComboBox_currentIndexChanged );
+  connect( mSourceComboBox, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsComposerAttributeTableWidget::mSourceComboBox_currentIndexChanged );
+  connect( mRelationsComboBox, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsComposerAttributeTableWidget::mRelationsComboBox_currentIndexChanged );
+  connect( mEmptyModeComboBox, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsComposerAttributeTableWidget::mEmptyModeComboBox_currentIndexChanged );
+  connect( mDrawEmptyCheckBox, &QCheckBox::toggled, this, &QgsComposerAttributeTableWidget::mDrawEmptyCheckBox_toggled );
+  connect( mEmptyMessageLineEdit, &QLineEdit::editingFinished, this, &QgsComposerAttributeTableWidget::mEmptyMessageLineEdit_editingFinished );
+  connect( mIntersectAtlasCheckBox, &QCheckBox::stateChanged, this, &QgsComposerAttributeTableWidget::mIntersectAtlasCheckBox_stateChanged );
+  connect( mUniqueOnlyCheckBox, &QCheckBox::stateChanged, this, &QgsComposerAttributeTableWidget::mUniqueOnlyCheckBox_stateChanged );
+  connect( mEmptyFrameCheckBox, &QCheckBox::toggled, this, &QgsComposerAttributeTableWidget::mEmptyFrameCheckBox_toggled );
+  connect( mHideEmptyBgCheckBox, &QCheckBox::toggled, this, &QgsComposerAttributeTableWidget::mHideEmptyBgCheckBox_toggled );
+  connect( mWrapBehaviorComboBox, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &QgsComposerAttributeTableWidget::mWrapBehaviorComboBox_currentIndexChanged );
+  connect( mAdvancedCustomisationButton, &QPushButton::clicked, this, &QgsComposerAttributeTableWidget::mAdvancedCustomisationButton_clicked );
   setPanelTitle( tr( "Table properties" ) );
 
   mContentFontToolButton->setMode( QgsFontButton::ModeQFont );
   mHeaderFontToolButton->setMode( QgsFontButton::ModeQFont );
 
   blockAllSignals( true );
+
+  registerDataDefinedButton( mLayerComboDDBtn, QgsComposerObject::LayerAttributeTable );
+  connect( mLayerComboDDBtn, &QgsPropertyOverrideButton::activated, mLayerComboBox, &QgsMapLayerComboBox::setDisabled );
 
   mResizeModeComboBox->addItem( tr( "Use existing frames" ), QgsComposerMultiFrame::UseExistingFrames );
   mResizeModeComboBox->addItem( tr( "Extend to next page" ), QgsComposerMultiFrame::ExtendToNextPage );
@@ -114,7 +149,7 @@ QgsComposerAttributeTableWidget::QgsComposerAttributeTableWidget( QgsComposerAtt
   connect( mContentFontToolButton, &QgsFontButton::changed, this, &QgsComposerAttributeTableWidget::contentFontChanged );
 }
 
-void QgsComposerAttributeTableWidget::on_mRefreshPushButton_clicked()
+void QgsComposerAttributeTableWidget::mRefreshPushButton_clicked()
 {
   if ( !mComposerTable )
   {
@@ -124,7 +159,7 @@ void QgsComposerAttributeTableWidget::on_mRefreshPushButton_clicked()
   mComposerTable->refreshAttributes();
 }
 
-void QgsComposerAttributeTableWidget::on_mAttributesPushButton_clicked()
+void QgsComposerAttributeTableWidget::mAttributesPushButton_clicked()
 {
   if ( !mComposerTable )
   {
@@ -201,7 +236,7 @@ void QgsComposerAttributeTableWidget::composerMapChanged( QgsComposerItem *item 
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mMaximumRowsSpinBox_valueChanged( int i )
+void QgsComposerAttributeTableWidget::mMaximumRowsSpinBox_valueChanged( int i )
 {
   if ( !mComposerTable )
   {
@@ -221,7 +256,7 @@ void QgsComposerAttributeTableWidget::on_mMaximumRowsSpinBox_valueChanged( int i
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mMarginSpinBox_valueChanged( double d )
+void QgsComposerAttributeTableWidget::mMarginSpinBox_valueChanged( double d )
 {
   if ( !mComposerTable )
   {
@@ -255,7 +290,7 @@ void QgsComposerAttributeTableWidget::headerFontChanged()
     composition->endMultiFrameCommand();
 }
 
-void QgsComposerAttributeTableWidget::on_mHeaderFontColorButton_colorChanged( const QColor &newColor )
+void QgsComposerAttributeTableWidget::mHeaderFontColorButton_colorChanged( const QColor &newColor )
 {
   if ( !mComposerTable )
   {
@@ -291,7 +326,7 @@ void QgsComposerAttributeTableWidget::contentFontChanged()
     composition->endMultiFrameCommand();
 }
 
-void QgsComposerAttributeTableWidget::on_mContentFontColorButton_colorChanged( const QColor &newColor )
+void QgsComposerAttributeTableWidget::mContentFontColorButton_colorChanged( const QColor &newColor )
 {
   if ( !mComposerTable )
   {
@@ -310,7 +345,7 @@ void QgsComposerAttributeTableWidget::on_mContentFontColorButton_colorChanged( c
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mGridStrokeWidthSpinBox_valueChanged( double d )
+void QgsComposerAttributeTableWidget::mGridStrokeWidthSpinBox_valueChanged( double d )
 {
   if ( !mComposerTable )
   {
@@ -329,7 +364,7 @@ void QgsComposerAttributeTableWidget::on_mGridStrokeWidthSpinBox_valueChanged( d
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mGridColorButton_colorChanged( const QColor &newColor )
+void QgsComposerAttributeTableWidget::mGridColorButton_colorChanged( const QColor &newColor )
 {
   if ( !mComposerTable )
   {
@@ -348,7 +383,7 @@ void QgsComposerAttributeTableWidget::on_mGridColorButton_colorChanged( const QC
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mDrawHorizontalGrid_toggled( bool state )
+void QgsComposerAttributeTableWidget::mDrawHorizontalGrid_toggled( bool state )
 {
   if ( !mComposerTable )
   {
@@ -367,7 +402,7 @@ void QgsComposerAttributeTableWidget::on_mDrawHorizontalGrid_toggled( bool state
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mDrawVerticalGrid_toggled( bool state )
+void QgsComposerAttributeTableWidget::mDrawVerticalGrid_toggled( bool state )
 {
   if ( !mComposerTable )
   {
@@ -386,7 +421,7 @@ void QgsComposerAttributeTableWidget::on_mDrawVerticalGrid_toggled( bool state )
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mShowGridGroupCheckBox_toggled( bool state )
+void QgsComposerAttributeTableWidget::mShowGridGroupCheckBox_toggled( bool state )
 {
   if ( !mComposerTable )
   {
@@ -405,7 +440,7 @@ void QgsComposerAttributeTableWidget::on_mShowGridGroupCheckBox_toggled( bool st
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mBackgroundColorButton_colorChanged( const QColor &newColor )
+void QgsComposerAttributeTableWidget::mBackgroundColorButton_colorChanged( const QColor &newColor )
 {
   if ( !mComposerTable )
   {
@@ -631,7 +666,7 @@ void QgsComposerAttributeTableWidget::setMaximumNumberOfFeatures( int n )
   whileBlocking( mMaximumRowsSpinBox )->setValue( n );
 }
 
-void QgsComposerAttributeTableWidget::on_mShowOnlyVisibleFeaturesCheckBox_stateChanged( int state )
+void QgsComposerAttributeTableWidget::mShowOnlyVisibleFeaturesCheckBox_stateChanged( int state )
 {
   if ( !mComposerTable )
   {
@@ -656,7 +691,7 @@ void QgsComposerAttributeTableWidget::on_mShowOnlyVisibleFeaturesCheckBox_stateC
   mComposerMapLabel->setEnabled( state == Qt::Checked );
 }
 
-void QgsComposerAttributeTableWidget::on_mUniqueOnlyCheckBox_stateChanged( int state )
+void QgsComposerAttributeTableWidget::mUniqueOnlyCheckBox_stateChanged( int state )
 {
   if ( !mComposerTable )
   {
@@ -676,7 +711,7 @@ void QgsComposerAttributeTableWidget::on_mUniqueOnlyCheckBox_stateChanged( int s
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mEmptyFrameCheckBox_toggled( bool checked )
+void QgsComposerAttributeTableWidget::mEmptyFrameCheckBox_toggled( bool checked )
 {
   if ( !mFrame )
   {
@@ -688,7 +723,7 @@ void QgsComposerAttributeTableWidget::on_mEmptyFrameCheckBox_toggled( bool check
   mFrame->endCommand();
 }
 
-void QgsComposerAttributeTableWidget::on_mHideEmptyBgCheckBox_toggled( bool checked )
+void QgsComposerAttributeTableWidget::mHideEmptyBgCheckBox_toggled( bool checked )
 {
   if ( !mFrame )
   {
@@ -700,7 +735,7 @@ void QgsComposerAttributeTableWidget::on_mHideEmptyBgCheckBox_toggled( bool chec
   mFrame->endCommand();
 }
 
-void QgsComposerAttributeTableWidget::on_mIntersectAtlasCheckBox_stateChanged( int state )
+void QgsComposerAttributeTableWidget::mIntersectAtlasCheckBox_stateChanged( int state )
 {
   if ( !mComposerTable )
   {
@@ -721,7 +756,7 @@ void QgsComposerAttributeTableWidget::on_mIntersectAtlasCheckBox_stateChanged( i
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mFeatureFilterCheckBox_stateChanged( int state )
+void QgsComposerAttributeTableWidget::mFeatureFilterCheckBox_stateChanged( int state )
 {
   if ( !mComposerTable )
   {
@@ -752,7 +787,7 @@ void QgsComposerAttributeTableWidget::on_mFeatureFilterCheckBox_stateChanged( in
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mFeatureFilterEdit_editingFinished()
+void QgsComposerAttributeTableWidget::mFeatureFilterEdit_editingFinished()
 {
   if ( !mComposerTable )
   {
@@ -772,7 +807,7 @@ void QgsComposerAttributeTableWidget::on_mFeatureFilterEdit_editingFinished()
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mFeatureFilterButton_clicked()
+void QgsComposerAttributeTableWidget::mFeatureFilterButton_clicked()
 {
   if ( !mComposerTable )
   {
@@ -803,7 +838,7 @@ void QgsComposerAttributeTableWidget::on_mFeatureFilterButton_clicked()
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mHeaderHAlignmentComboBox_currentIndexChanged( int index )
+void QgsComposerAttributeTableWidget::mHeaderHAlignmentComboBox_currentIndexChanged( int index )
 {
   if ( !mComposerTable )
   {
@@ -822,7 +857,7 @@ void QgsComposerAttributeTableWidget::on_mHeaderHAlignmentComboBox_currentIndexC
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mHeaderModeComboBox_currentIndexChanged( int index )
+void QgsComposerAttributeTableWidget::mHeaderModeComboBox_currentIndexChanged( int index )
 {
   if ( !mComposerTable )
   {
@@ -841,7 +876,7 @@ void QgsComposerAttributeTableWidget::on_mHeaderModeComboBox_currentIndexChanged
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mWrapStringLineEdit_editingFinished()
+void QgsComposerAttributeTableWidget::mWrapStringLineEdit_editingFinished()
 {
   if ( !mComposerTable )
   {
@@ -897,7 +932,7 @@ void QgsComposerAttributeTableWidget::changeLayer( QgsMapLayer *layer )
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mAddFramePushButton_clicked()
+void QgsComposerAttributeTableWidget::mAddFramePushButton_clicked()
 {
   if ( !mComposerTable || !mFrame )
   {
@@ -920,7 +955,7 @@ void QgsComposerAttributeTableWidget::on_mAddFramePushButton_clicked()
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mResizeModeComboBox_currentIndexChanged( int index )
+void QgsComposerAttributeTableWidget::mResizeModeComboBox_currentIndexChanged( int index )
 {
   if ( !mComposerTable )
   {
@@ -938,7 +973,7 @@ void QgsComposerAttributeTableWidget::on_mResizeModeComboBox_currentIndexChanged
   mAddFramePushButton->setEnabled( mComposerTable->resizeMode() == QgsComposerMultiFrame::UseExistingFrames );
 }
 
-void QgsComposerAttributeTableWidget::on_mSourceComboBox_currentIndexChanged( int index )
+void QgsComposerAttributeTableWidget::mSourceComboBox_currentIndexChanged( int index )
 {
   if ( !mComposerTable )
   {
@@ -956,7 +991,7 @@ void QgsComposerAttributeTableWidget::on_mSourceComboBox_currentIndexChanged( in
   toggleSourceControls();
 }
 
-void QgsComposerAttributeTableWidget::on_mRelationsComboBox_currentIndexChanged( int index )
+void QgsComposerAttributeTableWidget::mRelationsComboBox_currentIndexChanged( int index )
 {
   if ( !mComposerTable )
   {
@@ -972,7 +1007,7 @@ void QgsComposerAttributeTableWidget::on_mRelationsComboBox_currentIndexChanged(
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mEmptyModeComboBox_currentIndexChanged( int index )
+void QgsComposerAttributeTableWidget::mEmptyModeComboBox_currentIndexChanged( int index )
 {
   if ( !mComposerTable )
   {
@@ -990,7 +1025,7 @@ void QgsComposerAttributeTableWidget::on_mEmptyModeComboBox_currentIndexChanged(
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mWrapBehaviorComboBox_currentIndexChanged( int index )
+void QgsComposerAttributeTableWidget::mWrapBehaviorComboBox_currentIndexChanged( int index )
 {
   if ( !mComposerTable )
   {
@@ -1006,7 +1041,7 @@ void QgsComposerAttributeTableWidget::on_mWrapBehaviorComboBox_currentIndexChang
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mAdvancedCustomisationButton_clicked()
+void QgsComposerAttributeTableWidget::mAdvancedCustomisationButton_clicked()
 {
   if ( !mComposerTable )
   {
@@ -1017,7 +1052,7 @@ void QgsComposerAttributeTableWidget::on_mAdvancedCustomisationButton_clicked()
   d.exec();
 }
 
-void QgsComposerAttributeTableWidget::on_mDrawEmptyCheckBox_toggled( bool checked )
+void QgsComposerAttributeTableWidget::mDrawEmptyCheckBox_toggled( bool checked )
 {
   if ( !mComposerTable )
   {
@@ -1036,7 +1071,7 @@ void QgsComposerAttributeTableWidget::on_mDrawEmptyCheckBox_toggled( bool checke
   }
 }
 
-void QgsComposerAttributeTableWidget::on_mEmptyMessageLineEdit_editingFinished()
+void QgsComposerAttributeTableWidget::mEmptyMessageLineEdit_editingFinished()
 {
   if ( !mComposerTable )
   {
@@ -1062,6 +1097,8 @@ void QgsComposerAttributeTableWidget::toggleSourceControls()
     case QgsComposerAttributeTableV2::LayerAttributes:
       mLayerComboBox->setEnabled( true );
       mLayerComboBox->setVisible( true );
+      mLayerComboDDBtn->setVisible( true );
+      mLayerComboBox->setEnabled( ! mLayerComboDDBtn->isActive() );
       mLayerLabel->setVisible( true );
       mRelationsComboBox->setEnabled( false );
       mRelationsComboBox->setVisible( false );
@@ -1075,6 +1112,7 @@ void QgsComposerAttributeTableWidget::toggleSourceControls()
     case QgsComposerAttributeTableV2::AtlasFeature:
       mLayerComboBox->setEnabled( false );
       mLayerComboBox->setVisible( false );
+      mLayerComboDDBtn->setVisible( false );
       mLayerLabel->setVisible( false );
       mRelationsComboBox->setEnabled( false );
       mRelationsComboBox->setVisible( false );
@@ -1088,6 +1126,7 @@ void QgsComposerAttributeTableWidget::toggleSourceControls()
     case QgsComposerAttributeTableV2::RelationChildren:
       mLayerComboBox->setEnabled( false );
       mLayerComboBox->setVisible( false );
+      mLayerComboDDBtn->setVisible( false );
       mLayerLabel->setVisible( false );
       mRelationsComboBox->setEnabled( true );
       mRelationsComboBox->setVisible( true );

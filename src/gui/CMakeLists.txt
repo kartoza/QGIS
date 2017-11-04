@@ -161,6 +161,7 @@ SET(QGIS_GUI_SRCS
 
   layout/qgslayoutitemguiregistry.cpp
   layout/qgslayoutitemwidget.cpp
+  layout/qgslayoutmousehandles.cpp
   layout/qgslayoutnewitempropertiesdialog.cpp
   layout/qgslayoutruler.cpp
   layout/qgslayoutunitscombobox.cpp
@@ -295,6 +296,8 @@ SET(QGIS_GUI_SRCS
   qgsmessagelogviewer.cpp
   qgsmessageviewer.cpp
   qgsmetadatawidget.cpp
+  qgsnewauxiliarylayerdialog.cpp
+  qgsnewauxiliaryfielddialog.cpp
   qgsnewhttpconnection.cpp
   qgsnewmemorylayerdialog.cpp
   qgsnewnamedialog.cpp
@@ -455,6 +458,8 @@ SET(QGIS_GUI_MOC_HDRS
   qgsmessagelogviewer.h
   qgsmessageviewer.h
   qgsmetadatawidget.h
+  qgsnewauxiliarylayerdialog.h
+  qgsnewauxiliaryfielddialog.h
   qgsnewhttpconnection.h
   qgsnewmemorylayerdialog.h
   qgsnewnamedialog.h
@@ -657,6 +662,7 @@ SET(QGIS_GUI_MOC_HDRS
   layout/qgslayoutdesignerinterface.h
   layout/qgslayoutitemguiregistry.h
   layout/qgslayoutitemwidget.h
+  layout/qgslayoutmousehandles.h
   layout/qgslayoutnewitempropertiesdialog.h
   layout/qgslayoutruler.h
   layout/qgslayoutunitscombobox.h

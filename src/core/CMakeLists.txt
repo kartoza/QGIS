@@ -134,6 +134,7 @@ SET(QGIS_CORE_SRCS
   qgsattributes.cpp
   qgsattributetableconfig.cpp
   qgsattributeeditorelement.cpp
+  qgsauxiliarystorage.cpp
   qgsbearingutils.cpp
   qgsbrowsermodel.cpp
   qgscachedfeatureiterator.cpp
@@ -359,6 +360,7 @@ SET(QGIS_CORE_SRCS
   dxf/qgsdxfpallabeling.cpp
 
   layout/qgslayout.cpp
+  layout/qgslayoutaligner.cpp
   layout/qgslayoutcontext.cpp
   layout/qgslayoutgridsettings.cpp
   layout/qgslayoutguidecollection.cpp
@@ -370,6 +372,7 @@ SET(QGIS_CORE_SRCS
   layout/qgslayoutitemundocommand.cpp
   layout/qgslayoutmeasurement.cpp
   layout/qgslayoutmeasurementconverter.cpp
+  layout/qgslayoutmodel.cpp
   layout/qgslayoutobject.cpp
   layout/qgslayoutpagecollection.cpp
   layout/qgslayoutserializableobject.cpp
@@ -570,6 +573,7 @@ SET(QGIS_CORE_MOC_HDRS
   qgsactionmanager.h
   qgsactionscoperegistry.h
   qgsanimatedicon.h
+  qgsauxiliarystorage.h
   qgsbrowsermodel.h
   qgscoordinatereferencesystem.h
   qgscredentials.h
@@ -714,6 +718,7 @@ SET(QGIS_CORE_MOC_HDRS
   layout/qgslayoutitempage.h
   layout/qgslayoutitemregistry.h
   layout/qgslayoutitemshape.h
+  layout/qgslayoutmodel.h
   layout/qgslayoutpagecollection.h
   layout/qgslayoutobject.h
 
@@ -963,6 +968,7 @@ SET(QGIS_CORE_HDRS
   composer/qgscomposertexttable.h
   composer/qgspaperitem.h
 
+  layout/qgslayoutaligner.h
   layout/qgslayoutcontext.h
   layout/qgslayoutgridsettings.h
   layout/qgslayoutitemundocommand.h

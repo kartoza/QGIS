@@ -16,14 +16,23 @@ export LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
 export CTEST_BUILD_COMMAND="/usr/bin/ninja"
 export CTEST_PARALLEL_LEVEL=1
 
+##############################
+# Variables for output styling
+##############################
+
+bold=$(tput bold)
+endbold=$(tput sgr0)
+
 ###########
 # Configure
 ###########
-pushd /root/QGIS
+pushd /root/QGIS > /dev/null
 mkdir -p build
 
-pushd build
+pushd build > /dev/null
 
+echo "travis_fold:start:cmake"
+echo "${bold}Running cmake...${endbold}"
 cmake \
  -GNinja \
  -DWITH_STAGED_PLUGINS=ON \
@@ -39,12 +48,14 @@ cmake \
  -DWITH_BINDINGS=ON \
  -DDISABLE_DEPRECATED=ON \
  -DCXX_EXTRA_FLAGS=${CLANG_WARNINGS} ..
+echo "travis_fold:end:cmake"
 
 #######
 # Build
 #######
 echo "travis_fold:start:ninja-build.1"
-ninja
+echo "${bold}Building QGIS...${endbold}"
+${CTEST_BUILD_COMMAND}
 echo "travis_fold:end:ninja-build.1"
 
 ############################
@@ -56,9 +67,9 @@ export PGHOST=postgres
 export PGPASSWORD=docker
 export PGDATABASE=qgis_test
 
-pushd /root/QGIS
+pushd /root/QGIS > /dev/null
 /root/QGIS/tests/testdata/provider/testdata_pg.sh
-popd # /root/QGIS
+popd > /dev/null # /root/QGIS
 
 ###########
 # Run tests
@@ -68,9 +79,12 @@ python3 /root/QGIS/.ci/travis/scripts/ctest2travis.py xvfb-run ctest -V -E "$(ca
 ########################
 # Show ccache statistics
 ########################
+echo "travis_fold:start:ccache.stats"
+echo "ccache statistics"
 ccache -s
+echo "travis_fold:end:ccache.stats"
 
-popd # build
-popd # /root/QGIS
+popd > /dev/null # build
+popd > /dev/null # /root/QGIS
 
 [ -r /tmp/ctest-important.log ] && cat /tmp/ctest-important.log || true

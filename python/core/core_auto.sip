@@ -157,6 +157,7 @@
 %Include composer/qgscomposermultiframecommand.sip
 %Include composer/qgscomposertexttable.sip
 %Include composer/qgspaperitem.sip
+%Include layout/qgslayoutaligner.sip
 %Include layout/qgslayoutcontext.sip
 %Include layout/qgslayoutgridsettings.sip
 %Include layout/qgslayoutmeasurement.sip
@@ -296,6 +297,7 @@
 %Include qgsapplication.sip
 %Include qgsactionscoperegistry.sip
 %Include qgsanimatedicon.sip
+%Include qgsauxiliarystorage.sip
 %Include qgsbrowsermodel.sip
 %Include qgscoordinatereferencesystem.sip
 %Include qgscredentials.sip
@@ -405,6 +407,7 @@
 %Include layout/qgslayoutitempage.sip
 %Include layout/qgslayoutitemregistry.sip
 %Include layout/qgslayoutitemshape.sip
+%Include layout/qgslayoutmodel.sip
 %Include layout/qgslayoutpagecollection.sip
 %Include layout/qgslayoutobject.sip
 %Include symbology/qgscptcityarchive.sip

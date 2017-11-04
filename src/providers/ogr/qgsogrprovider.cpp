@@ -765,15 +765,15 @@ QStringList QgsOgrProvider::subLayers() const
         fCount[wkbUnknown] = 0;
       }
 
-      // List TIN and PolyhedralSurface as MultiPolygon
+      // List TIN and PolyhedralSurface as Polygon
       if ( fCount.contains( wkbTIN ) )
       {
-        fCount[wkbMultiPolygon] = fCount.value( wkbMultiPolygon ) + fCount[wkbTIN];
+        fCount[wkbPolygon] = fCount.value( wkbPolygon ) + fCount[wkbTIN];
         fCount.remove( wkbTIN );
       }
       if ( fCount.contains( wkbPolyhedralSurface ) )
       {
-        fCount[wkbMultiPolygon] = fCount.value( wkbMultiPolygon ) + fCount[wkbPolyhedralSurface];
+        fCount[wkbPolygon] = fCount.value( wkbPolygon ) + fCount[wkbPolyhedralSurface];
         fCount.remove( wkbPolyhedralSurface );
       }
       // When there are CurvePolygons, promote Polygons
@@ -2152,11 +2152,11 @@ QString  QgsOgrProvider::description() const
   call.  The regular express, glob, will have both all lower and upper
   case versions added.
 
-  @note
+  \note
 
   Copied from qgisapp.cpp.
 
-  @todo XXX This should probably be generalized and moved to a standard
+  \todo XXX This should probably be generalized and moved to a standard
             utility type thingy.
 
 */
@@ -2663,7 +2663,8 @@ QGISEXTERN QgsOgrProvider *classFactory( const QString *uri )
 
 
 
-/** Required key function (used to map the plugin to a data store type)
+/**
+ * Required key function (used to map the plugin to a data store type)
 */
 QGISEXTERN QString providerKey()
 {
@@ -2689,7 +2690,8 @@ QGISEXTERN bool isProvider()
   return true;
 }
 
-/** Creates an empty data source
+/**
+ * Creates an empty data source
 @param uri location to store the file(s)
 @param format data format (e.g. "ESRI Shapefile"
 @param vectortype point/line/polygon or multitypes

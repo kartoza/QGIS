@@ -810,6 +810,43 @@ class QgsMeanCoordinatesAlgorithm : public QgsProcessingAlgorithm
 
 };
 
+/**
+ * Native raster layer unique values report algorithm.
+ */
+class QgsRasterLayerUniqueValuesReportAlgorithm : public QgsProcessingAlgorithm
+{
+
+  public:
+
+    QgsRasterLayerUniqueValuesReportAlgorithm() = default;
+    void initAlgorithm( const QVariantMap &configuration = QVariantMap() ) override;
+    QString name() const override { return QStringLiteral( "rasterlayeruniquevaluesreport" ); }
+    QString displayName() const override { return QObject::tr( "Raster layer unique values report" ); }
+    virtual QStringList tags() const override { return QObject::tr( "count,area,statistics" ).split( ',' ); }
+    QString group() const override { return QObject::tr( "Raster analysis" ); }
+    QString shortHelpString() const override;
+    QgsRasterLayerUniqueValuesReportAlgorithm *createInstance() const override SIP_FACTORY;
+
+  protected:
+
+    virtual bool prepareAlgorithm( const QVariantMap &parameters, QgsProcessingContext &context, QgsProcessingFeedback *feedback ) override;
+    virtual QVariantMap processAlgorithm( const QVariantMap &parameters,
+                                          QgsProcessingContext &context, QgsProcessingFeedback *feedback ) override;
+
+  private:
+
+    std::unique_ptr< QgsRasterInterface > mInterface;
+    bool mHasNoDataValue = false;
+    int mLayerWidth;
+    int mLayerHeight;
+    QgsRectangle mExtent;
+    QgsCoordinateReferenceSystem mCrs;
+    double mRasterUnitsPerPixelX;
+    double mRasterUnitsPerPixelY;
+    QString mSource;
+
+};
+
 ///@endcond PRIVATE
 
 #endif // QGSNATIVEALGORITHMS_H
